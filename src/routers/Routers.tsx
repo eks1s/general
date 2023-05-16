@@ -2,17 +2,21 @@ import { Layout } from "@components/Layout/Layout";
 import LoginPage from "@pages/login/LoginPage";
 import { MainPage } from "@pages/main/Main";
 import { NotFoundPage } from "@pages/notFound/NotFoundPage";
-import RegisterPage from "@pages/register/RegisterPage";
 import { Route, Routes } from "react-router-dom";
+import { PrivateRoute } from "./PrivateRoute";
+import { PublicRoute } from "./PublicRoute";
 
 export function Routers() {
     return (
         <Routes>
             <Route path="/" element={<Layout />}>
-                <Route index element={<MainPage />} />
+                <Route element={<PublicRoute />}>
+                    <Route path="/login" element={<LoginPage />} />
+                </Route>
 
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
+                <Route element={<PrivateRoute />}>
+                    <Route index element={<MainPage />} />
+                </Route>
 
                 <Route path="*" element={<NotFoundPage />} />
             </Route>

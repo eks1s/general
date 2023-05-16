@@ -1,44 +1,37 @@
 import { useAuthStore } from "@zustand/useAuthZustand";
 import { auth } from "../firebase";
 import { User, onAuthStateChanged } from "firebase/auth";
-import { ReactNode, createContext, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { ReactNode, createContext, useEffect, useMemo } from "react";
+import { Loader } from "@components/Loader/Loader";
 
 interface AuthContextState {
     user: User;
-    isLoading: boolean;
 }
 
 export const ProviderContext = createContext<AuthContextState>({
-    isLoading: false,
     user: {} as User,
 });
 
 export const Provider = ({ children }: { children: ReactNode }) => {
-    const { user, isLoading, setUser, setIsLoading } = useAuthStore();
-    const [contextLoading, setContextLoading] = useState<boolean>(false);
-    const value = useMemo(() => ({ user, isLoading }), [user, isLoading]);
-    const navigate = useNavigate();
+    const { user, setUser, isLoading, setIsLoading } = useAuthStore();
+    const value = useMemo(() => ({ user }), [user]);
 
     useEffect(() => {
+        setIsLoading(true);
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 setUser(user);
             } else {
-                setIsLoading(true);
-                setContextLoading(true);
                 setUser({} as User);
-                navigate("/login");
             }
 
-            setContextLoading(false);
             setIsLoading(false);
         });
-    }, [navigate, setIsLoading, setUser]);
+    }, [setUser, setIsLoading]);
 
     return (
         <ProviderContext.Provider value={value}>
-            {contextLoading ? "Loading..." : children}
+            {isLoading ? <Loader /> : children}
         </ProviderContext.Provider>
     );
 };

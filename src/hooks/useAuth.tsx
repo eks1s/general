@@ -9,45 +9,36 @@ import {
 import { useNavigate } from "react-router-dom";
 
 function useAuth() {
-    const { user, setUser, isLoading, setIsLoading, error, setError } =
-        useAuthStore();
+    const { user, setUser, isLoading, error, setError } = useAuthStore();
     const navigate = useNavigate();
 
     const signUp = async (email: string, password: string) => {
-        setIsLoading(true);
         await createUserWithEmailAndPassword(auth, email, password)
             .then((res) => {
                 setUser(res.user);
-                setIsLoading(false);
+
                 navigate("/");
             })
-            .catch((error: Error) => setError(error.message))
-            .finally(() => setIsLoading(false));
+            .catch((error: Error) => setError(error.message));
     };
 
     const signIn = async (email: string, password: string) => {
-        setIsLoading(true);
         await signInWithEmailAndPassword(auth, email, password)
             .then((res) => {
                 setUser(res.user);
-                setIsLoading(false);
+
                 navigate("/");
             })
-            .catch((error: Error) => setError(error.message))
-            .finally(() => setIsLoading(false));
+            .catch((error: Error) => setError(error.message));
     };
 
     const logOut = () => {
-        setIsLoading(true);
         signOut(auth)
             .then(() => {
                 setUser({} as User);
                 navigate("/login");
             })
-            .catch((error: Error) => setError(error.message))
-            .finally(() => {
-                setIsLoading(false);
-            });
+            .catch((error: Error) => setError(error.message));
     };
 
     return { signIn, signUp, logOut, user, isLoading, error };
